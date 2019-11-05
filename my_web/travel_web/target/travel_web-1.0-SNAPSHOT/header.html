@@ -1,0 +1,145 @@
+<!-- 头部 start -->
+<!--处理 是否有登陆  看一下session是否有数据 此处一定需要访问服务器 -->
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/getParameter.js"></script>
+
+<!--查看是否登陆-->
+<script>
+    $(function () {
+        $.post("UserServlet","method=checkLogin",function (resultInfo) {
+            if(resultInfo.flag){//未发生异常
+                if(resultInfo.data==""){//未登录
+                   // alert("未登录");
+                    $(".shortcut").html("  <!-- 未登录状态  -->\n" +
+                        "            <div class=\"login_out\">\n" +
+                        "                <a href=\"login.html\">登录</a>\n" +
+                        "                <a href=\"register.html\">注册</a>\n" +
+                        "            </div>");
+                }else{//登陆了
+                    var name = resultInfo.data;
+                    $(".shortcut").html("<!-- 登录状态  -->\n" +
+                        "            <div class=\"login\">\n" +
+                        "            \t\n" +
+                        "                <span >欢迎回来，"+name+"</span>\n" +
+                        "                <a href=\"myfavorite.html?pageNumber=1\" class=\"collection\">我的收藏</a>\n" +
+                        "                <a href=\"javascript:void(0)\" onclick='loginOut()'>退出</a>\n" +
+                        "            </div>         ")
+                }
+
+            }
+        },"json");
+
+    })
+        /*退出系统*/  /*放置函数时要注意位置*/
+        function loginOut() {
+            //将session user资源 清除
+             var flag = confirm("您确定要退出吗");
+             if(flag){//如果确定退出
+               location.href = "UserServlet?method=loginOut";
+             }
+            //表示退出系统
+
+        }
+</script>
+<!--处理  导航条   从数据库获得导航信息  添加到  网页-->
+<!--查询分类信息-->
+<script>
+    $(function () {
+        /*获得搜索框的数据*/
+      //  var text=$(".header_wrap.topbar.search input").var();
+        $.post("CategoryServlet" , "method=findAllCategory" , function(data){
+            //先定义一个字符串
+            var tempStr = "<li class=\"nav-active\"><a href=\"index.html\">首页</a></li>";
+
+            //需要遍历数据
+            $(data).each(function () {
+                tempStr+="<li><a href=\"route_list.html?pageNumber=1&cid="+this.cid+" \">"+this.cname+"</a></li>";
+            })
+            /*$(data).each(function(){
+                //拼接  this 表示当前对象 每一个category
+                tempStr+="<li><a href=\"route_list.html?pageNumber=1&cid="+this.cid+"\">"+this.cname+"</a></li>";
+            });*/
+            //往ul下添加内容
+             tempStr += "<li class=\"nav-active\"><a href=\"favoriterank.html?pageNumber=1\">收藏排行榜</a></li>";
+            $(".navitem .nav").html(tempStr);
+        } , "json")
+
+    })
+</script>
+
+ <!--获得搜索框的数据-->
+
+<script>
+    //点击事件
+    function searchData() {
+       // alert("haha")
+        var searchword= $("#searchwordId").val();
+        var cid=getParameter("cid");
+        //location.href=("route_list.html?pageNumber=1&cid="+cid+"&rname="+rname);
+        location.href="route_list.html?pageNumber=1&searchword="+searchword+"&cid="+cid;
+    }
+
+        //页面加载==>> 点击搜索 肯定要跳转页面 页面加载函数会被执行 ==>>获得数据 动态的往搜索框中添加数据
+        $(function(){
+
+
+            //从地址栏拿到刚才输入的数据
+            var searchword = getParameter("searchword");
+            searchword = decodeURI(searchword);
+            //重新赋值文本框
+            $("#searchwordId").val(searchword);
+        })
+
+</script>
+
+
+    <header id="header">
+        <div class="top_banner">
+            <img src="images/top_banner.jpg" alt="">
+        </div>
+        <div class="shortcut">
+
+
+
+        </div>
+        <div class="header_wrap">
+            <div class="topbar">
+                <div class="logo">
+                    <a href="/"><img src="images/logo.jpg" alt=""></a>
+                </div>
+                <div class="search">
+                    <input name="" type="text" id="searchwordId"  placeholder="请输入路线名称" class="search_input" autocomplete="off">
+                    <a href="javascript:void(0);" onclick="searchData()" class="search-button">搜索</a>
+                </div>
+                <div class="hottel">
+                    <div class="hot_pic">
+                        <img src="images/hot_tel.jpg" alt="">
+                    </div>
+                    <div class="hot_tel">
+                        <p class="hot_time">客服热线(9:00-6:00)</p>
+                        <p class="hot_num">400-618-9090</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- 头部 end -->
+     <!-- 首页导航 -->
+    <div class="navitem">
+        <ul class="nav">
+          <!--  <li class="nav-active"><a href="index.html">首页</a></li>
+
+            <li><a href="route_list.html">门票</a></li>
+            <li><a href="route_list.html">酒店</a></li>
+            <li><a href="route_list.html">香港车票</a></li>
+            <li><a href="route_list.html">出境游</a></li>
+            <li><a href="route_list.html">国内游</a></li>
+            <li><a href="route_list.html">港澳游</a></li>
+            <li><a href="route_list.html">抱团定制</a></li>
+
+
+            <li><a href="route_list.html">全球自由行</a></li>
+            <li><a href="favoriterank.html">收藏排行榜</a></li>-->
+        </ul>
+    </div>
+    
